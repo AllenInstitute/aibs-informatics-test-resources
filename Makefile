@@ -70,20 +70,46 @@ $(PYTHON):
 	python3 -m venv $(VENV) --prompt $(shell basename $(PACKAGE_DIR))
 	$(PYTHON) -m pip install --upgrade pip
 
-
 install: $(INSTALL_STAMP) ## Installs package dependencies
 $(INSTALL_STAMP): $(PYTHON) $(DEP_FILES)
-	@source $(VENV_BIN)/activate;				\
-	if [ -f requirements-dev.txt ]; then		\
-		$(PIP) install -r requirements-dev.txt --config-settings editable_mode=strict; \
-	elif [ -f requirements.txt ]; then			\
-		$(PIP) install -r requirements.txt --config-settings editable_mode=strict;		\
-	else										\
-		$(PIP) install -e . --config-settings editable_mode=strict;					\
-	fi
+	@source $(VENV_BIN)/activate;\
+	pip install -e .[dev]; 
 	@touch $(INSTALL_STAMP)
 
-.PHONY: create-venv install
+install-force: clean-install-stamp install ## Force install package dependencies
+
+link-packages: ## Link local packages to virtualenv  
+	@parent_dir=$$(dirname $$(pwd)); \
+	local_packages=$$(ls $$parent_dir); \
+	dependencies=$$($(PIP) list --format freeze --exclude-editable | awk -F '==' '{print $$1}');\
+	for local_package in $$local_packages; do \
+		for dependency in $$dependencies; do \
+			if [ $$local_package == $$dependency ]; then \
+				echo "Reinstalling $$local_package dependency to local override"; \
+				$(PIP) install -e $$parent_dir/$$local_package --no-deps; \
+			fi \
+		done; \
+	done
+
+unlink-packages: ## Unlink local packages from virtualenv
+	@parent_dir=$$(dirname $$(pwd)); \
+	this_package=$$(basename $$(pwd)); \
+	local_packages=$$(ls $$parent_dir); \
+	dependencies=$$($(PIP) list --format freeze --editable | awk -F '==' '{print $$1}');\
+	is_found=0; \
+	for local_package in $$local_packages; do \
+		for dependency in $$dependencies; do \
+			if [ $$local_package == $$dependency ] && [ $$local_package != $$this_package ]; then \
+				is_found=1; \
+			fi; \
+		done \
+	done; \
+	if [ $$is_found == 1 ]; then \
+		echo "Found dependencies installed locally, reinstalling..."; \
+		make clean-install-stamp install; \
+	fi
+
+.PHONY: create-venv install install-force link-packages unlink-packages
 
 #######################
 ##@ Formatting Commands
