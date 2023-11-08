@@ -13,7 +13,6 @@ import pytest
 
 
 class BaseTest(unittest.TestCase):
-
     reset_environ: ClassVar[bool] = False
 
     def setUp(self) -> None:
