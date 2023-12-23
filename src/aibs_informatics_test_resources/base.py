@@ -3,6 +3,7 @@ import os
 import re
 import tempfile
 import unittest
+from contextlib import contextmanager
 from contextlib import nullcontext as does_not_raise
 from copy import deepcopy
 from pathlib import Path
@@ -83,3 +84,12 @@ class BaseTest(unittest.TestCase):
         self.addCleanup(patcher.stop)
         thing = patcher.start()
         return thing
+
+    @contextmanager
+    def chdir(self, destination: Union[str, Path]):
+        current_dir = os.getcwd()
+        try:
+            os.chdir(destination)
+            yield
+        finally:
+            os.chdir(current_dir)
