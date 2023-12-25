@@ -1,4 +1,7 @@
-# aibs-informatics-test-resources
-Python test utility package
+# AIBS Informatics Test Resources
 
-fill in later with details
+[![Build Status](https://github.com/AllenInstitute/aibs-informatics-test-resources/actions/workflows/build.yml/badge.svg)](https://github.com/AllenInstitute/aibs-informatics-test-resources/actions/workflows/build.yml)
+
+---
+
+Python test utility package
