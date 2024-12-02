@@ -1,0 +1,65 @@
+name: Publish to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      part:
+        description: "Semver part to bump (major, minor, patch)"
+        type: choice
+        required: true
+        default: "patch"
+        options: ["major", "minor", "patch"]
+      dry-run:
+        description: "Dry run"
+        type: boolean
+        required: true
+        default: true
+
+jobs:
+
+  build:
+    name: Build distribution
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4        
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      - name: Set up AllenInstitute Repo Authorization
+        uses: ./.github/actions/setup-ai-github-urls
+        with:
+          token: ${{ secrets.AI_PACKAGES_TOKEN }}
+      - name: Run Release
+        run: |
+          make dist
+        shell: bash
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish-to-pypi:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/aibs-informatics-test-resources
+    permissions:
+      id-token: write # IMPORTANT: mandatory for trusted publishing
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish distribution to PyPI
+        if: ${{ github.event.inputs.dry-run == 'false' }}
+        uses: pypa/gh-action-pypi-publish@release/v1

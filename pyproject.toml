@@ -3,11 +3,6 @@
 #   https://setuptools.pypa.io/en/latest/setuptools.html#building-and-distributing-packages-with-setuptools
 # -----------------------------------------------------------------------------
 
-# [build-system]
-# requires = ["setuptools>=61", "setuptools_scm[toml]>=6.2", "wheel"]
-# build-backend = "setuptools.build_meta"
-# [tool.setuptools_scm]
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -15,18 +10,29 @@ build-backend = "hatchling.build"
 # -----------------------------------------------------------------------------
 [project]
 name = "aibs-informatics-test-resources"
-description = "unit test resources for informatics packages"
+authors = [{ name = "AIBS Informatics Group"}]
+maintainers = [{ name = "AIBS Informatics Group", email = "marmot@alleninstitute.onmicrosoft.com"}]
+description = "unit test resources for AIBS informatics packages"
+license = { file = "LICENSE" }
 dynamic = ["version"]
 
 requires-python = ">=3.9"
 dependencies = [
     "black==23.11.0",
-    "coverage[toml]~=7.3.2",
+    "coverage[toml]~=7.3",
     "flake8~=6.1.0",
     "isort~=5.10",
-    "mypy~=1.6.1",
-    "pytest~=7.4.3",
+    "mypy~=1.6",
+    "pytest~=7.4",
     "pytest-cov",
+]
+
+[project.optional-dependencies]
+
+release = [
+    "build",
+    "twine",
+    "wheel",
 ]
 
 [tool.setuptools.packages.find]
@@ -35,6 +41,11 @@ where = ["src"]
 [tool.hatch.version]
 path = "src/aibs_informatics_test_resources/__version__.py"
 
+[project.urls]
+Documentation = "https://.github.io/aibs-informatics-test-resources/"
+Homepage = "https://github.com/AllenInstitute/aibs-informatics-test-resources/"
+Issues = "https://github.com/AllenInstitute/aibs-informatics-test-resources/issues"
+Repository = "https://github.com/AllenInstitute/aibs-informatics-test-resources/"
 
 # -----------------------------------------------------------------------------
 ##  Pyright Configurations
