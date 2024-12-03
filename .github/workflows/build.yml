@@ -3,8 +3,14 @@ name: Build and Test
 on:
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - '**/_version.py'
   push:
     branches: [ main ]
+    tags-ignore:
+      - 'v*'
+    paths-ignore:
+      - '**/_version.py'
 
 jobs:
   test:
