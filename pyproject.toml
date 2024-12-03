@@ -13,6 +13,7 @@ name = "aibs-informatics-test-resources"
 authors = [{ name = "AIBS Informatics Group"}]
 maintainers = [{ name = "AIBS Informatics Group", email = "marmot@alleninstitute.onmicrosoft.com"}]
 description = "unit test resources for AIBS informatics packages"
+readme = { file = "README.md", content-type = "text/markdown" }
 license = { file = "LICENSE" }
 dynamic = ["version"]
 
