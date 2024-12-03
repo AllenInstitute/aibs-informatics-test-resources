@@ -14,6 +14,12 @@ on:
         type: boolean
         required: true
         default: true
+      python-version:
+        description: "Python version used to build the distribution"
+        type: choice
+        required: true
+        default: "3.11"
+        options: ["3.9", "3.10", "3.11", "3.12"]
 
 jobs:
   bump:
@@ -27,14 +33,15 @@ jobs:
       SHORT_VERSION: ${{ steps.get-version-and-commit-sha.outputs.SHORT_VERSION }}
       MAJOR_VERSION: ${{ steps.get-version-and-commit-sha.outputs.MAJOR_VERSION }}
       MINOR_VERSION: ${{ steps.get-version-and-commit-sha.outputs.MINOR_VERSION }}
+      PATCH_VERSION: ${{ steps.get-version-and-commit-sha.outputs.PATCH_VERSION }}
       COMMIT_SHA: ${{ steps.get-version-and-commit-sha.outputs.COMMIT_SHA }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up Python 3.11
+      - name: Set up Python ${{ github.event.inputs.python-version }}
         uses: actions/setup-python@v4        
         with:
-          python-version: 3.11
+          python-version: ${{ github.event.inputs.python-version }}
           cache: 'pip'
       - name: Set up AllenInstitute Repo Authorization
         uses: ./.github/actions/setup-ai-github-urls
@@ -69,29 +76,34 @@ jobs:
           echo "MAJOR_VERSION=$major_version" >> $GITHUB_OUTPUT
           minor_version="$(cut -d '.' -f 2 <<< $version)"
           echo "MINOR_VERSION=$minor_version" >> $GITHUB_OUTPUT
+          patch_version="$(cut -d '.' -f 3 <<< $version)"
+          echo "PATCH_VERSION=$patch_version" >> $GITHUB_OUTPUT
           short_version="$major_version.$minor_version"
           echo "SHORT_VERSION=$short_version" >> $GITHUB_OUTPUT
           commit_sha=$(git rev-parse $latest_tag)
           echo "COMMIT_SHA=$commit_sha" >> $GITHUB_OUTPUT
-      - name: Show short version
-        run: echo ${{ steps.get-version-and-commit-sha.outputs.SHORT_VERSION }}
+      - name: Show version
+        run: |
+          echo VERSION: ${{ steps.get-version-and-commit-sha.outputs.VERSION }}
+          echo SHORT_VERSION: ${{ steps.get-version-and-commit-sha.outputs.SHORT_VERSION }}
+          echo MAJOR_VERSION: ${{ steps.get-version-and-commit-sha.outputs.MAJOR_VERSION }}
+          echo MINOR_VERSION: ${{ steps.get-version-and-commit-sha.outputs.MINOR_VERSION }}
+          echo PATCH_VERSION: ${{ steps.get-version-and-commit-sha.outputs.PATCH_VERSION }}
+          echo COMMIT_SHA: ${{ steps.get-version-and-commit-sha.outputs.COMMIT_SHA }}
 
   build:
     name: Build distribution
     runs-on: ubuntu-latest
     needs: bump
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    if: ${{ github.event.inputs.dry-run == 'false' }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.bump.outputs.COMMIT_SHA }}
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ github.event.inputs.python-version }}
         uses: actions/setup-python@v4        
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ github.event.inputs.python-version }}
           cache: 'pip'
       - name: Set up AllenInstitute Repo Authorization
         uses: ./.github/actions/setup-ai-github-urls
@@ -110,6 +122,7 @@ jobs:
   publish-to-pypi:
     name: Publish to PyPI
     needs: build
+    if: ${{ github.event.inputs.dry-run == 'false' }}
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -123,5 +136,4 @@ jobs:
           name: python-package-distributions
           path: dist/
       - name: Publish distribution to PyPI
-        if: ${{ github.event.inputs.dry-run == 'false' }}
         uses: pypa/gh-action-pypi-publish@release/v1
