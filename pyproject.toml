@@ -28,6 +28,7 @@ dependencies = [
 all = [
     "aibs-informatics-test-resources[formatting]",
     "aibs-informatics-test-resources[typing]",
+    "aibs-informatics-test-resources[linting]",
 ]
 
 formatting = [
@@ -38,6 +39,10 @@ formatting = [
 
 typing = [
     "mypy~=1.6",
+]
+
+linting = [
+    "ruff",
 ]
 
 release = [
@@ -191,7 +196,6 @@ ignore_errors = false
 #   https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#what-on-earth-is-a-pyproject-toml-file
 # -----------------------------------------------------------------------------
 
-
 [tool.black]
 line-length = 99
 include = '\.pyi?$'
@@ -206,6 +210,18 @@ include = '\.pyi?$'
 line_length = 99
 profile = "black"
 src_paths = ["src", "test"]
+
+# -----------------------------------------------------------------------------
+##  ruff Configurations
+#   https://beta.ruff.rs/docs/configuration/
+# -----------------------------------------------------------------------------
+
+[tool.ruff]
+line-length = 99
+select = ["E", "F", "W", "C90"]
+ignore = ["E501"]
+src_paths = ["src", "test"]
+fix = true
 
 # -----------------------------------------------------------------------------
 ##  bumpversion Configurations
