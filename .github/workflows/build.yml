@@ -20,7 +20,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    env:
+      PYTHON_VERSION: ${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -36,3 +38,18 @@ jobs:
         run: |
           make release
         shell: bash
+      - name: Upload coverage reports
+        if: |
+          ${{ 
+            success() 
+            && (
+              (github.event_name == 'pull_request' && github.base_ref == 'main' )
+              || (github.event_name == 'push' && github.ref_name == 'main')
+            )
+            && matrix.python-version == "3.11" 
+          }}
+        uses: codecov/codecov-action@v3
+        with:
+          # https://github.com/codecov/codecov-action#arguments
+          token: ${{ secrets.CODECOV_TOKEN }}
+          env_vars: PYTHON_VERSION
