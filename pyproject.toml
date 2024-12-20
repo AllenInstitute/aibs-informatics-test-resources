@@ -86,7 +86,8 @@ source = [
 
 [tool.coverage.report]
 omit = [
-    "test/*"
+    "test/*",
+    "src/aibs_informatics_test_resources/__version__.py",
 ]
 skip_empty = true
 
