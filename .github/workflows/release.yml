@@ -39,6 +39,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install uv
+        id: setup-uv
+        uses: astral-sh/setup-uv@v2
+        with:
+          version: "0.5.7"
       - name: Set up Python ${{ github.event.inputs.python-version }}
         uses: actions/setup-python@v4        
         with:
@@ -61,7 +66,7 @@ jobs:
       - name: Bump version with bumpversion
         run: |
           source .venv/bin/activate  
-          bump-my-version bump ${{ github.event.inputs.part }}
+          uvx --from bump-my-version bump-my-version bump ${{ github.event.inputs.part }}
       - name: Commit and push with tags
         if: ${{ github.event.inputs.dry-run == 'false' }}
         run: |
