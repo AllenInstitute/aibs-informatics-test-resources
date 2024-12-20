@@ -24,22 +24,37 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
+        uv-resolution: ["highest", "lowest"]
+        exclude:
+          - python-version: "3.10"
+            uv-resolution: "lowest"
+          - python-version: "3.11"
+            uv-resolution: "lowest"
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4        
+      - name: Install uv
+        id: setup-uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          python-version: ${{ github.event.inputs.python-version }}
       - name: Set up AllenInstitute Repo Authorization
         uses: ./.github/actions/setup-ai-github-urls
         with:
           token: ${{ secrets.AI_PACKAGES_TOKEN }}
       - name: Run Release
         run: |
-          make release
+          # Install dependencies
+          uv sync --frozen --group all --all-extras --resolution ${{ matrix.uv-resolution }}
+          
+          # Linting 
+          uv run black ./ --check
+          uv run isort ./ --check
+          uv run mypy ./
+
+          # Testing
+          uv run pytest -vv --durations=10
         shell: bash
       - name: Upload coverage reports
         if: |

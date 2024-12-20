@@ -26,30 +26,51 @@ dependencies = [
 
 [project.optional-dependencies]
 all = [
-    "aibs-informatics-test-resources[formatting]",
-    "aibs-informatics-test-resources[typing]",
     "aibs-informatics-test-resources[linting]",
+    "aibs-informatics-test-resources[typing]",
 ]
 
-formatting = [
-    "black==23.11.0",
-    "flake8~=6.1.0",
+linting = [
+    "black~=23.11.0",
     "isort~=5.10",
+    "ruff",
 ]
 
 typing = [
     "mypy~=1.6",
 ]
 
-linting = [
-    "ruff",
+[dependency-groups]
+
+dev = [
+    { include-group = 'linting' },
+    { include-group = 'typing' },
 ]
 
 release = [
+    { include-group = 'bump' },
+    { include-group = 'build' }    
+]
+
+linting = [
+    "black~=23.11",
+    "isort",
+    "ruff",
+]
+
+typing = [
+    "mypy",
+]   
+
+bump = [
+    "bumpversion",
+]
+
+build = [
     "build",
-    "bump-my-version",
     "wheel",
 ]
+
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -62,6 +83,14 @@ Documentation = "https://.github.io/aibs-informatics-test-resources/"
 Homepage = "https://github.com/AllenInstitute/aibs-informatics-test-resources/"
 Issues = "https://github.com/AllenInstitute/aibs-informatics-test-resources/issues"
 Repository = "https://github.com/AllenInstitute/aibs-informatics-test-resources/"
+
+
+# -----------------------------------------------------------------------------
+##  astral-uv Configurations
+#   https://docs.astral.sh/uv/getting-started/
+# -----------------------------------------------------------------------------
+
+[tool.uv]
 
 # -----------------------------------------------------------------------------
 ##  Pyright Configurations
