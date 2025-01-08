@@ -135,6 +135,7 @@ lint: lint-ruff lint-mypy  ## Run all lint targets (ruff, mypy)
 
 
 format-ruff: .uv ## Run ruff formatter 
+	uv run ruff check --fix
 	uv run ruff format
 
 format: format-ruff  ## Run all formatters (ruff) 
