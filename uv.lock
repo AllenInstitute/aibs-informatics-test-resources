@@ -36,14 +36,10 @@ bump = [
     { name = "bumpversion" },
 ]
 dev = [
-    { name = "black" },
-    { name = "isort" },
     { name = "mypy" },
     { name = "ruff" },
 ]
 linting = [
-    { name = "black" },
-    { name = "isort" },
     { name = "ruff" },
 ]
 release = [
@@ -77,16 +73,10 @@ build = [
 ]
 bump = [{ name = "bumpversion" }]
 dev = [
-    { name = "black", specifier = "~=23.11" },
-    { name = "isort" },
     { name = "mypy" },
     { name = "ruff" },
 ]
-linting = [
-    { name = "black", specifier = "~=23.11" },
-    { name = "isort" },
-    { name = "ruff" },
-]
+linting = [{ name = "ruff" }]
 release = [
     { name = "build" },
     { name = "bumpversion" },

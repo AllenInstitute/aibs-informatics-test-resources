@@ -74,11 +74,16 @@ obliterate: clean-venv clean  ## alias to clean, clean-venv
 install: .uv  ## Installs package dependencies
 	uv sync --frozen --group all --all-extras
 
-rebuild-lockfiles: .uv  ## Rebuilds the lockfiles
+.PHONY: install
+
+rebuild-lockfile: .uv  ## Rebuilds the lockfile
 	uv lock --upgrade
+
+.PHONY: rebuild-lockfiles
 
 make install-release: .uv  ## Installs package dependencies
 	uv sync --frozen --group release --all-extras
+.PHONY: install-release
 
 link-packages: ## Link local packages to virtualenv  
 	@parent_dir=$$(dirname $$(pwd)); \
@@ -92,6 +97,8 @@ link-packages: ## Link local packages to virtualenv
 			fi \
 		done; \
 	done
+
+.PHONY: link-packages
 
 unlink-packages: ## Unlink local packages from virtualenv
 	@parent_dir=$$(dirname $$(pwd)); \
@@ -112,33 +119,27 @@ unlink-packages: ## Unlink local packages from virtualenv
 		make install; \
 	fi
 
-.PHONY: create-venv install install-force install-release link-packages unlink-packages
+.PHONY: .uv install install-release rebuild-lockfile link-packages unlink-packages
 
 #######################
 ##@ Formatting Commands
 #######################
 
-lint-black: .uv ## Run black (check only)
-	uv run black ./ --check
-
-lint-isort: .uv ## Run isort (check only)
-	uv run isort ./ --check
+lint-ruff: .uv ## Run ruff checker
+	uv run ruff check
 
 lint-mypy: .uv ## Run mypy
 	uv run mypy ./
 
-lint: lint-isort lint-black lint-mypy  ## Run all lint targets (black, isort, mypy)
+lint: lint-ruff lint-mypy  ## Run all lint targets (ruff, mypy)
 
 
-format-black: .uv ## Format code using black
-	uv run black ./
+format-ruff: .uv ## Run ruff formatter 
+	uv run ruff format
 
-format-isort: .uv ## Format code using isort
-	uv run isort ./
+format: format-ruff  ## Run all formatters (ruff) 
 
-format: format-isort format-black  ## Run all formatters (black, isort) 
-
-.PHONY: lint-isort lint-black lint-mypy lint format-lint format-black format-mypy format
+.PHONY: lint-ruff lint-mypy lint format-ruff format-mypy format
 
 #####################
 ##@ Testing Commands
@@ -151,7 +152,6 @@ test: pytest  ## Run Standard Tests
 
 .PHONY: pytest test
 
-
 #####################
 ##@ Inspect Commands
 #####################
@@ -159,6 +159,7 @@ test: pytest  ## Run Standard Tests
 coverage-server: $(INSTALL_STAMP) ## Run coverage server
 	$(PYTHON) -m http.server $(COVERAGE_SERVER_PORT) -d $(COVERAGE_DIR)
 
+.PHONY: coverage-server
 
 #####################
 ##@ Release Commands
@@ -175,4 +176,4 @@ post-build: lint test  ## Run linters and tests
 release: pre-build build post-build  ## Runs pre-build, build, post-build
 run: release
 
-.PHONY: reinstall pre-build build post-build release run
+.PHONY: dist reinstall pre-build build post-build release run

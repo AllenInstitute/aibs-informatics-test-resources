@@ -53,8 +53,6 @@ release = [
 ]
 
 linting = [
-    "black~=23.11",
-    "isort",
     "ruff",
 ]
 
@@ -221,36 +219,17 @@ ignore_errors = false
 
 
 # -----------------------------------------------------------------------------
-##  Black Configurations
-#   https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#what-on-earth-is-a-pyproject-toml-file
-# -----------------------------------------------------------------------------
-
-[tool.black]
-line-length = 99
-include = '\.pyi?$'
-
-# -----------------------------------------------------------------------------
-##  isort Configurations
-#   https://pycqa.github.io/isort/docs/configuration/config_files.html
-# -----------------------------------------------------------------------------
-
-[tool.isort]
-# required for compatibility with black:
-line_length = 99
-profile = "black"
-src_paths = ["src", "test"]
-
-# -----------------------------------------------------------------------------
 ##  ruff Configurations
 #   https://beta.ruff.rs/docs/configuration/
 # -----------------------------------------------------------------------------
 
 [tool.ruff]
 line-length = 99
+src = ["src", "test"]
+
+[tool.ruff.lint]
 select = ["E", "F", "W", "C90"]
 ignore = ["E501"]
-src_paths = ["src", "test"]
-fix = true
 
 # -----------------------------------------------------------------------------
 ##  bumpversion Configurations
