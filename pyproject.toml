@@ -33,7 +33,7 @@ all = [
 linting = [
     "black~=23.11.0",
     "isort~=5.10",
-    "ruff",
+    "ruff~=0.9",
 ]
 
 typing = [
