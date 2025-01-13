@@ -53,7 +53,7 @@ release = [
 ]
 
 linting = [
-    "ruff",
+    "ruff~=0.9",
 ]
 
 typing = [
@@ -229,7 +229,6 @@ src = ["src", "test"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "C90"]
-ignore = ["E501"]
 
 # -----------------------------------------------------------------------------
 ##  bumpversion Configurations

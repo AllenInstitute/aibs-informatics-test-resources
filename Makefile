@@ -72,7 +72,7 @@ obliterate: clean-venv clean  ## alias to clean, clean-venv
 .PHONY: .uv
 
 install: .uv  ## Installs package dependencies
-	uv sync --frozen --group all --all-extras
+	uv sync --frozen --all-extras
 
 .PHONY: install
 
@@ -82,7 +82,8 @@ rebuild-lockfile: .uv  ## Rebuilds the lockfile
 .PHONY: rebuild-lockfiles
 
 make install-release: .uv  ## Installs package dependencies
-	uv sync --frozen --group release --all-extras
+	uv sync --frozen --group release
+
 .PHONY: install-release
 
 link-packages: ## Link local packages to virtualenv  
