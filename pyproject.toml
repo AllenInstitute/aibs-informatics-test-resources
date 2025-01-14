@@ -61,7 +61,7 @@ typing = [
 ]   
 
 bump = [
-    "bumpversion",
+    "bump-my-version",
 ]
 
 build = [
